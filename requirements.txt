@@ -1,0 +1,13 @@
+flask
+flask-login
+flask-bcrypt
+flask-wtf
+email_validator
+pillow
+qrcode
+pandas
+openpyxl
+reportlab
+sqlalchemy
+matplotlib
+python-dotenv
