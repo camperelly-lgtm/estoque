@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h5 class="m-0">
+                <i class="bi bi-cart4"></i> Requisição de Compra (Estoque Baixo)
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            {% if not itens %}
+            <div class="alert alert-info">
+                Não há itens com estoque baixo no momento.
+            </div>
+            {% else %}
+
+            <!-- Botão Selecionar / Desmarcar -->
+            <button type="button" class="btn btn-secondary mb-3" onclick="toggleCheck()">
+                🔃 Selecionar/Desmarcar Todos
+            </button>
+
+            <form method="POST" action="{{ url_for('requisicao_compra') }}">
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 50px;"></th>
+                                <th>Material</th>
+                                <th>Unidade</th>
+                                <th>Seção</th>
+                                <th style="width: 120px;">Qtd. Disponível</th>
+                                <th style="width: 120px;">Qtd. Pedir</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for p in itens %}
+                            <tr>
+                                <td class="text-center align-middle">
+                                    <input type="checkbox" class="item-check" name="item_{{ p.id }}">
+                                </td>
+                                <td class="align-middle">{{ p.nome }}</td>
+                                <td class="align-middle">{{ p.unidade or '-' }}</td>
+                                <td class="align-middle">{{ p.secao.nome if p.secao else '-' }}</td>
+                                <td class="align-middle text-center">{{ p.quantidade }}</td>
+                                <td class="align-middle">
+                                    <input type="number" name="qtd_{{ p.id }}" class="form-control" min="0" value="1">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr>
+
+                <!-- Adicionar item manualmente -->
+                <h6 class="fw-bold mt-3"><i class="bi bi-plus-circle"></i> Adicionar Item Manualmente</h6>
+
+                <div class="row g-2 mt-1">
+                    <div class="col-md-5">
+                        <input type="text" name="manual_nome" class="form-control" placeholder="Nome do material">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="manual_unid" class="form-control" placeholder="Unid. (Ex: UN)">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="manual_secao" class="form-control" placeholder="Seção (Opcional)">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="manual_qtd" class="form-control" placeholder="Qtd.">
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-send-check"></i> Gerar Requisição
+                    </button>
+                </div>
+
+            </form>
+
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPT SELECIONAR / DESMARCAR -->
+<script>
+function toggleCheck() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"].item-check');
+    let marcar = false;
+
+    checkboxes.forEach(ch => { if (!ch.checked) marcar = true; });
+
+    checkboxes.forEach(ch => ch.checked = marcar);
+}
+</script>
+
+{% endblock %}
